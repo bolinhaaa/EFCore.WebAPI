@@ -15,20 +15,21 @@ namespace EFCore.WebAPI.Controllers
     [ApiController]
     public class BatalhaController : ControllerBase
     {
-        private readonly HeroiContext _context;
+        private readonly IEFCoreRepository _repo;
 
-        public BatalhaController(HeroiContext context)
+        public BatalhaController(IEFCoreRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         // GET: api/<BatalhaController>
         [HttpGet]
-        public ActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                return Ok(new Batalha());
+                var herois = await _repo.GetAllHerois();
+                return Ok(herois);
             }
             catch (Exception ex)
             {
@@ -46,49 +47,55 @@ namespace EFCore.WebAPI.Controllers
 
         // POST api/<BatalhaController>
         [HttpPost]
-        public ActionResult Post(Batalha model)
+        public async Task<IActionResult> Post(Batalha model)
         {
             try
             {
-                _context.Batalhas.Add(model);
-                _context.SaveChanges();
+                _repo.Add(model);
 
-                return Ok("AEEE BUCETA");
+                if (await _repo.SaveChangesAsync())
+                {
+                    return Ok("AEEE BUCETA");
+                }
+                              
             }
             catch (Exception ex)
             {
 
                 return BadRequest($"Erro: {ex}");
             }
+
+            return BadRequest("Não Salvou");
         }
 
         // PUT api/<BatalhaController>/5
         [HttpPut("{id}")]
         public ActionResult Put(int id, Batalha model)
         {
-            try
-            {
-                if (_context.Batalhas.AsNoTracking().FirstOrDefault( h => h.Id == id) != null)
-                {
-                    _context.Update(model);
-                    _context.SaveChanges();
+            //try
+            //{
+            //    if (_context.Batalhas.AsNoTracking().FirstOrDefault( h => h.Id == id) != null)
+            //    {
+            //        _context.Update(model);
+            //        _context.SaveChanges();
 
                     return Ok("AEE BUCETA");
-                }
+            //    }
 
-                return Ok("Não encontrado");
-            }
-            catch (Exception ex)
-            {
+            //    return Ok("Não encontrado");
+            //}
+            //catch (Exception ex)
+            //{
 
-                return BadRequest($"Erro: {ex}");
-            }
+            //    return BadRequest($"Erro: {ex}");
+            //}
         }
 
         // DELETE api/<BatalhaController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+           
         }
     }
 }

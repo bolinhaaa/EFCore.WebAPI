@@ -31,8 +31,12 @@ namespace EFCore.WebAPI
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // instancia do contexto
+            services.AddScoped<IEFCoreRepository, EFCoreRepository>();
 
-            services.AddControllers();
+
+            services.AddControllers().AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
